@@ -1,22 +1,22 @@
 import express from 'express';
 import morgan from 'morgan';
+import cors from 'cors';
+import { initDB } from './services/dbService';
+import { specieRoutes, defaultRoutes } from './routes';
 
 const app = express();
 const port = 3000;
 
+initDB();
+
 app.use(morgan('dev'));
+app.use(express.json()); 
+app.use(cors());
 
-app.get('/', (req, res) => {
-    res.send('Hello')
-})
-app.get('/regions', async (req, res) => {
-});
+app.use('/api/species', specieRoutes); 
 
-app.get('/species', async (req, res) => {
-});
+app.use('/', defaultRoutes);
 
-app.get('/displaySpecies', (req, res) => {
-});
 
 app.listen(port, () => {
     console.log(`Server running at http://localhost:${port}/`);
