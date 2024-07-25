@@ -3,6 +3,7 @@ export interface Specie {
     name: string;
     region: string;
     status: string;
-    conservationMeasures: string;
+    class: string;
+    conservationMeasures?: string;
   }
   
