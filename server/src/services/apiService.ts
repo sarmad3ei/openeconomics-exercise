@@ -48,9 +48,24 @@ export const fetchSpeciesByRegion = async (region: string): Promise<Specie[]> =>
   }
 };
   
-  export const fetchConservationMeasures = async (speciesId: string) => {
-    return [
-      { title: "Measure 1 for " + speciesId },
-      { title: "Measure 2 for " + speciesId }
-    ];
-  };
+export const fetchConservationMeasures = async (speciesId: number): Promise<string> => {
+  try {
+    const response = await fetch(`https://apiv3.iucnredlist.org/api/v3/measures/species/id/${speciesId}?token=${API_TOKEN}`);
+    const data = await response.json();
+    const measures = data.result.map((measure: { title: string }) => measure.title).join(', ');
+    return measures;
+  } catch (error) {
+    console.error(`Error fetching conservation measures for species ID ${speciesId}:`, error);
+    throw error;
+  }
+};
+
+export const filterCriticallyEndangered = async (speciesList: Specie[]): Promise<Specie[]> => {
+  const criticallyEndangeredSpecies = speciesList.filter(species => species.category === 'CR');
+
+  for (const species of criticallyEndangeredSpecies) {
+    species.conservationMeasures = await fetchConservationMeasures(species.id);
+  }
+
+  return criticallyEndangeredSpecies;
+};

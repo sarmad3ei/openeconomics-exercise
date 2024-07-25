@@ -39,11 +39,6 @@ const fetchRegions = async (): Promise<Region[]> => {
   }
 };
 
-const getRandomRegion = (regions: Region[]): Region => {
-  const randomIndex = Math.floor(Math.random() * regions.length);
-  return regions[randomIndex];
-};
-
 const fetchSpeciesByRegion = async (region: string): Promise<Species[]> => {
   try {
     const fetch = (await import('node-fetch')).default;
@@ -72,16 +67,46 @@ const fetchSpeciesByRegion = async (region: string): Promise<Species[]> => {
   }
 };
 
+const fetchConservationMeasures = async (speciesId: number): Promise<string> => {
+  try {
+    const fetch = (await import('node-fetch')).default;
+    const response = await fetch(`https://apiv3.iucnredlist.org/api/v3/measures/species/id/${speciesId}?token=${API_TOKEN}`);
+    const data: any = await response.json();
+    const measures = data.result.map((measure: { title: string }) => measure.title).join(', ');
+    return measures;
+  } catch (error) {
+    console.error(`Error fetching conservation measures for species ID ${speciesId}:`, error);
+    throw error;
+  }
+};
+
+const filterCriticallyEndangered = async (speciesList: Species[]): Promise<Species[]> => {
+  const criticallyEndangeredSpecies = speciesList.filter(species => species.category === 'CR');
+
+  for (const species of criticallyEndangeredSpecies) {
+    species.conservationMeasures = await fetchConservationMeasures(species.id);
+  }
+
+  return criticallyEndangeredSpecies;
+};
+
+const getRandomElement = <T>(array: T[]): T => {
+  return array[Math.floor(Math.random() * array.length)];
+};
+
 const test = async () => {
   try {
     const regions = await fetchRegions();
     console.log('First 3 Regions:', regions.slice(0, 3));
 
-    const randomRegion = getRandomRegion(regions);
+    const randomRegion = getRandomElement(regions);
     console.log('Random Region:', randomRegion);
 
     const speciesList = await fetchSpeciesByRegion(randomRegion.identifier);
     console.log('First 3 Species List:', speciesList.slice(0, 3));
+
+    const criticallyEndangeredSpecies = await filterCriticallyEndangered(speciesList);
+    console.log('Critically Endangered Species with Conservation Measures:', criticallyEndangeredSpecies.slice(0, 3));
   } catch (error) {
     console.error('Error during test:', error);
   }
