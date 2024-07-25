@@ -5,13 +5,21 @@ import { fetchRegions, getRandomRegion, fetchSpeciesByRegion, filterCriticallyEn
 export const getSpeciesData = async (req: Request, res: Response) => {
   try {
     const regions = await fetchRegions();
+    console.log("Regions: ", regions);
+
     const randomRegion = getRandomRegion(regions);
+    console.log("Selected Random Regions: ", randomRegion);
     
     const speciesList = await fetchSpeciesByRegion(randomRegion.identifier);
+    console.log("Total Species in Region: ", speciesList.length);
+    
     const criticallyEndangeredSpecies = await filterCriticallyEndangered(speciesList);
+    console.log("Total Critically Endagered Species: ", criticallyEndangeredSpecies.length);
+    
     const mammals = filterMammals(speciesList);
+    console.log("Total Mammals in the Region: ", mammals.length);
 
-    for (const species of criticallyEndangeredSpecies.slice(0, 15)) {
+    for (const species of criticallyEndangeredSpecies.slice(0, 10)) {
       await saveSpecies(species);
     }
 
