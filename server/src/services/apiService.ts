@@ -5,8 +5,9 @@ const API_TOKEN = '9bb4facb6d23f48efbf424bb05c0c1ef1cf6f468393bc745d42179ac4aca5
 
 export const fetchRegions = async (): Promise<Region[]> => {
   try {
+    const fetch = (await import('node-fetch')).default;
     const response = await fetch(`https://apiv3.iucnredlist.org/api/v3/region/list?token=${API_TOKEN}`);
-    const data = await response.json();
+    const data: any = await response.json();
     return data.results.map((region: any) => ({
       name: region.name,
       identifier: region.identifier,
@@ -23,8 +24,9 @@ export const getRandomRegion = (regions: Region[]): Region => {
 
 export const fetchSpeciesByRegion = async (region: string): Promise<Specie[]> => {
   try {
+    const fetch = (await import('node-fetch')).default;
     const response = await fetch(`https://apiv3.iucnredlist.org/api/v3/species/region/${region}/page/0?token=${API_TOKEN}`);
-    const data = await response.json();
+    const data: any = await response.json();
     return data.result.map((item: any) => ({
       id: item.taxonid,
       kingdom: item.kingdom_name,
@@ -50,8 +52,9 @@ export const fetchSpeciesByRegion = async (region: string): Promise<Specie[]> =>
   
 export const fetchConservationMeasures = async (speciesId: number): Promise<string> => {
   try {
+    const fetch = (await import('node-fetch')).default;
     const response = await fetch(`https://apiv3.iucnredlist.org/api/v3/measures/species/id/${speciesId}?token=${API_TOKEN}`);
-    const data = await response.json();
+    const data:any = await response.json();
     const measures = data.result.map((measure: { title: string }) => measure.title).join(', ');
     return measures;
   } catch (error) {
@@ -68,4 +71,8 @@ export const filterCriticallyEndangered = async (speciesList: Specie[]): Promise
   }
 
   return criticallyEndangeredSpecies;
+};
+
+export const filterMammals = (speciesList: Specie[]): Specie[] => {
+  return speciesList.filter(species => species.class === 'MAMMALIA');
 };
