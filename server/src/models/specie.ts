@@ -3,7 +3,7 @@ export interface Specie {
   kingdom: string;
   phylum: string;
   class: string;
-  order: string;
+  "order": string;
   family: string;
   genus: string;
   scientificName: string;
