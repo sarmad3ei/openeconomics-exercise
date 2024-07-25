@@ -94,6 +94,9 @@ const getRandomElement = <T>(array: T[]): T => {
   return array[Math.floor(Math.random() * array.length)];
 };
 
+const filterMammals = (speciesList: Species[]): Species[] => {
+  return speciesList.filter(species => species.class === 'MAMMALIA');
+};
 const test = async () => {
   try {
     const regions = await fetchRegions();
@@ -107,6 +110,9 @@ const test = async () => {
 
     const criticallyEndangeredSpecies = await filterCriticallyEndangered(speciesList);
     console.log('Critically Endangered Species with Conservation Measures:', criticallyEndangeredSpecies.slice(0, 3));
+
+    const mammals = filterMammals(speciesList);
+    console.log('First 3 Mammals:', mammals.slice(0, 3));
   } catch (error) {
     console.error('Error during test:', error);
   }
