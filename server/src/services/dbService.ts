@@ -1,6 +1,6 @@
 import sqlite3 from 'sqlite3';
 import { Specie } from '../models/specie';
-import { promisify } from 'util';
+
 sqlite3.verbose();
 
 const db = new sqlite3.Database('./db/database.sqlite');
@@ -8,25 +8,60 @@ const db = new sqlite3.Database('./db/database.sqlite');
 export const initDB = () => {
   db.run(`
     CREATE TABLE IF NOT EXISTS species (
-      id TEXT PRIMARY KEY,
-      name TEXT,
-      region TEXT,
-      status TEXT,
+      id INTEGER PRIMARY KEY,
+      kingdom TEXT,
+      phylum TEXT,
       class TEXT,
+      "order" TEXT,
+      family TEXT,
+      genus TEXT,
+      scientificName TEXT,
+      taxonomicAuthority TEXT,
+      infraRank TEXT,
+      infraName TEXT,
+      population TEXT,
+      category TEXT,
+      mainCommonName TEXT,
+      region TEXT,
       conservationMeasures TEXT
     )
   `);
 };
-const runAsync = promisify(db.run.bind(db));
-const allAsync = promisify(db.all.bind(db));
 
-export const saveSpecies = (specie: Specie) => {
-  const sqlquery = db.prepare(`
-    INSERT OR REPLACE INTO species (id, name, region, status, class, conservationMeasures)
-    VALUES (?, ?, ?, ?, ?, ?)
-  `);
-  sqlquery.run(specie.id, specie.name, specie.region, specie.status, specie.class, specie.conservationMeasures);
-  sqlquery.finalize();
+const runAsync = (sql: string, params: any[] = []) => new Promise<void>((resolve, reject) => {
+  db.run(sql, params, function (err) {
+    if (err) {
+      reject(err);
+    } else {
+      resolve();
+    }
+  });
+});
+
+const allAsync = (sql: string, params: any[] = []) => new Promise<any[]>((resolve, reject) => {
+  db.all(sql, params, function (err, rows) {
+    if (err) {
+      reject(err);
+    } else {
+      resolve(rows);
+    }
+  });
+});
+
+export const saveSpecies = async (species: Specie) => {
+  const sqlquery = `
+    INSERT OR REPLACE INTO species (
+      id, kingdom, phylum, class, "order", family, genus, scientificName,
+      taxonomicAuthority, infraRank, infraName, population, category,
+      mainCommonName, region, conservationMeasures
+    ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+  `;
+  await runAsync(sqlquery, [
+    species.id, species.kingdom, species.phylum, species.class, species.order,
+    species.family, species.genus, species.scientificName, species.taxonomicAuthority,
+    species.infraRank, species.infraName, species.population, species.category,
+    species.mainCommonName, species.region, species.conservationMeasures
+  ]);
 };
 
 export const getAllSpecies = async (): Promise<Specie[]> => {
