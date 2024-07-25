@@ -11,10 +11,12 @@ const SpeciesTable: React.FC<SpeciesTableProps> = ({ species }) => (
     <thead>
       <tr>
         <th>ID</th>
-        <th>Name</th>
-        <th>Region</th>
-        <th>Status</th>
+        <th>Kingdom</th>
         <th>Class</th>
+        <th>Population</th>
+        <th>Category</th>
+        <th>Main Common Name</th>
+        <th>Region</th>
         <th>Conservation Measures</th>
       </tr>
     </thead>
@@ -22,10 +24,12 @@ const SpeciesTable: React.FC<SpeciesTableProps> = ({ species }) => (
       {species.map(specie => (
         <tr key={specie.id}>
           <td>{specie.id}</td>
-          <td>{specie.name}</td>
-          <td>{specie.region}</td>
-          <td>{specie.status}</td>
+          <td>{specie.kingdom}</td>
           <td>{specie.class}</td>
+          <td>{specie.population}</td>
+          <td>{specie.category}</td>
+          <td>{specie.mainCommonName}</td>
+          <td>{specie.region}</td>
           <td>{specie.conservationMeasures}</td>
         </tr>
       ))}
